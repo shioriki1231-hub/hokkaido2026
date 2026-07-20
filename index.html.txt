@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>北海道7日自由行 🗺️</title>
+  <style>
+    :root {
+      --bg-color: #f0f7ff;
+      --card-bg: #ffffff;
+      --primary: #4a90e2;
+      --primary-light: #e6f0fa;
+      --accent: #5ca4ea;
+      --text-main: #2c3e50;
+      --text-muted: #7f8c8d;
+      --border-radius: 16px;
+      --shadow: 0 4px 12px rgba(74, 144, 226, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 12px;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 480px; /* 手機App般寬度 */
+      background: var(--bg-color);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding-bottom: 24px;
+    }
+
+    /* Header & Save Indicator */
+    header {
+      background: var(--card-bg);
+      padding: 16px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 2px solid #d0e3f7;
+    }
+
+    h1 {
+      font-size: 1.2rem;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .save-status {
+      font-size: 0.8rem;
+      padding: 4px 8px;
+      border-radius: 12px;
+      background: #e8f5e9;
+      color: #2e7d32;
+      font-weight: bold;
+    }
+
+    .save-status.error {
+      background: #ffebee;
+      color: #c62828;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      border: 1px solid #e1effe;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: bold;
+      color: var(--primary);
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Day Selector Buttons */
+    .days-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-bottom: 12px;
+    }
+
+    .day-btn {
+      flex: 0 0 auto;
+      padding: 8px 14px;
+      border-radius: 20px;
+      border: 1px solid #c2dcfe;
+      background: var(--card-bg);
+      color: var(--primary);
+      font-weight: bold;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .day-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    /* Timeline Items */
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .item-card {
+      background: var(--primary-light);
+      padding: 12px;
+      border-radius: 12px;
+      position: relative;
+    }
+
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .item-time {
+      color: var(--primary);
+      font-size: 0.85rem;
+    }
+
+    .map-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 6px;
+      color: #1976d2;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+
+    /* Form Controls */
+    input, select, button {
+      font-size: 0.9rem;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #c2dcfe;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-danger {
+      background: #ff6b6b;
+      color: white;
+      border: none;
+      cursor: pointer;
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      border-radius: 6px;
+    }
+
+    /* Accounting Section */
+    .flex-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .flex-row input {
+      flex: 1;
+    }
+
+    .expense-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .expense-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px;
+      border-bottom: 1px dashed #c2dcfe;
+    }
+
+    .total-box {
+      margin-top: 12px;
+      padding: 10px;
+      background: #fff9e6;
+      border-radius: 8px;
+      border: 1px solid #ffe599;
+      font-size: 0.9rem;
+      display: flex;
+      justify-content: space-between;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <header>
+    <h1><span>🧳</span> 北海道7日遊</h1>
+    <span id="saveStatus" class="save-status">💾 已儲存</span>
+  </header>
+
+  <!-- 行程表區塊 -->
+  <div class="card">
+    <div class="card-title">
+      <span>📅 行程規劃</span>
+    </div>
+    
+    <!-- 每日切換按鈕 (動態生成) -->
+    <div class="days-scroll" id="daysContainer"></div>
+
+    <!-- 當日行程列表 -->
+    <div class="timeline" id="timelineContainer"></div>
+
+    <!-- 新增行程簡易表單 -->
+    <div style="margin-top: 16px; border-top: 1px dashed #d0e3f7; padding-top: 12px;">
+      <div class="flex-row">
+        <input type="time" id="newTime" style="width: 100px;">
+        <input type="text" id="newTitle" placeholder="行程名稱 (例: 定山溪溫泉)">
+      </div>
+      <div class="flex-row">
+        <input type="text" id="newMapQuery" placeholder="地標名稱 (自動生成導航)">
+        <button class="btn-primary" onclick="addScheduleItem()">新增</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 記帳與匯率區塊 -->
+  <div class="card">
+    <div class="card-title">
+      <span>💴 旅費記帳</span>
+      <div style="font-size: 0.8rem; font-weight: normal;">
+        匯率: <input type="number" id="exchangeRate" value="0.052" step="0.001" style="width: 65px; padding: 2px 4px;" onchange="updateRate()">
+      </div>
+    </div>
+
+    <div class="flex-row">
+      <input type="text" id="expenseItem" placeholder="項目 (例: 湯咖哩)">
+      <input type="number" id="expenseAmount" placeholder="日幣 (JPY)" style="width: 100px;">
+      <button class="btn-primary" onclick="addExpense()">記帳</button>
+    </div>
+
+    <ul class="expense-list" id="expenseList"></ul>
+
+    <div class="total-box">
+      <span>總計支出：</span>
+      <span id="totalExpenseText">0 JPY (約 HKD $0)</span>
+    </div>
+    <button class="btn-danger" style="margin-top: 10px; width: 100%;" onclick="clearExpenses()">清空所有帳單</button>
+  </div>
+</div>
+
+<script>
+  // 資料版本號，便於未來升級相容
+  const DATA_VERSION = "1.0";
+  const STORAGE_KEY = "HOKKAIDO_TRIP_DATA_V1";
+
+  // 預設的 7 日行程資料
+  const defaultData = {
+    version: DATA_VERSION,
+    currentDay: 0,
+    rate: 0.052,
+    days: [
+      { date: "8/6 (四) Day 1", items: [
+        { time: "09:05", title: "香港起飛 (HB880)", query: "香港國際機場" },
+        { time: "15:05", title: "到達新千歲機場", query: "新千歲機場" },
+        { time: "17:00", title: "酒店 Check-in", query: "KOKO Hotel Sapporo Odori" }
+      ]},
+      { date: "8/7 (五) Day 2", items: [
+        { time: "10:00", title: "出發至真駒內站", query: "真駒內站" },
+        { time: "11:00", title: "頭大佛殿", query: "頭大佛殿" },
+        { time: "14:00", title: "RASORA商場 / AEON", query: "RASORA Sapporo" }
+      ]},
+      { date: "8/8 (六) Day 3", items: [
+        { time: "07:30", title: "札幌站集合 (花海一日遊)", query: "札幌站" },
+        { time: "11:00", title: "四季彩之丘 / 富田農場", query: "四季彩之丘" }
+      ]},
+      { date: "8/9 (日) Day 4", items: [
+        { time: "11:33", title: "搭乘巴士前往定山溪", query: "大通西1丁目" },
+        { time: "13:00", title: "定山溪溫泉街 / 二見吊橋", query: "定山溪溫泉" }
+      ]},
+      { date: "8/10 (一) Day 5", items: [
+        { time: "09:30", title: "二條市場吃海鮮", query: "二條市場" },
+        { time: "12:40", title: "支笏湖 & 洞爺湖煙火一日遊", query: "洞爺湖" }
+      ]},
+      { date: "8/11 (二) Day 6", items: [
+        { time: "10:00", title: "北海道神宮", query: "北海道神宮" },
+        { time: "14:00", title: "小樽運河散策", query: "小樽運河" }
+      ]},
+      { date: "8/12 (三) Day 7", items: [
+        { time: "13:00", title: "新千歲機場購物", query: "新千歲機場" },
+        { time: "16:05", title: "起飛返港 (HB881)", query: "新千歲機場" }
+      ]}
+    ],
+    expenses: []
+  };
+
+  let appData = {};
+
+  // 初始化與載入
+  function initApp() {
+    loadData();
+    renderDayButtons();
+    renderTimeline();
+    renderExpenses();
+    document.getElementById('exchangeRate').value = appData.rate;
+  }
+
+  // 自動儲存至 localStorage
+  function saveData() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+      showSaveStatus(true);
+    } catch (e) {
+      showSaveStatus(false);
+    }
+  }
+
+  // 從 localStorage 還原資料
+  function loadData() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.version === DATA_VERSION) {
+          appData = parsed;
+        } else {
+          appData = defaultData; // 版本不符時恢復預設
+        }
+      } catch (e) {
+        appData = defaultData;
+      }
+    } else {
+      appData = defaultData;
+    }
+  }
+
+  function showSaveStatus(success) {
+    const statusEl = document.getElementById('saveStatus');
+    if (success) {
+      statusEl.textContent = "💾 已儲存";
+      statusEl.classList.remove("error");
+    } else {
+      statusEl.textContent = "⚠️ 儲存失敗";
+      statusEl.classList.add("error");
+    }
+  }
+
+  // 渲染日期按鈕
+  function renderDayButtons() {
+    const container = document.getElementById('daysContainer');
+    container.innerHTML = '';
+    appData.days.forEach((day, index) => {
+      const btn = document.createElement('button');
+      btn.className = `day-btn ${index === appData.currentDay ? 'active' : ''}`;
+      btn.textContent = day.date.split(' ')[0]; // 只顯示日期簡稱
+      btn.onclick = () => {
+        appData.currentDay = index;
+        renderDayButtons();
+        renderTimeline();
+        saveData();
+      };
+      container.appendChild(btn);
+    });
+  }
+
+  // 渲染行程列表
+  function renderTimeline() {
+    const container = document.getElementById('timelineContainer');
+    container.innerHTML = '';
+    const currentItems = appData.days[appData.currentDay].items;
+
+    if (currentItems.length === 0) {
+      container.innerHTML = `<div style="text-align:center; color: var(--text-muted); padding: 12px;">當天暫無行程～</div>`;
+      return;
+    }
+
+    currentItems.forEach((item, index) => {
+      const card = document.createElement('div');
+      card.className = 'item-card';
+      const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.query || item.title)}`;
+      
+      card.innerHTML = `
+        <div class="item-header">
+          <span class="item-time">⏰ ${item.time || '全天'}</span>
+          <button class="btn-danger" onclick="deleteScheduleItem(${index})">刪除</button>
+        </div>
+        <div style="font-weight: bold; margin-top: 4px;">${item.title}</div>
+        <a href="${mapUrl}" target="_blank" class="map-link">📍 在 Google Maps 打開導航</a>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  // 新增行程
+  function addScheduleItem() {
+    const time = document.getElementById('newTime').value;
+    const title = document.getElementById('newTitle').value;
+    const query = document.getElementById('newMapQuery').value || title;
+
+    if (!title) return alert("請輸入行程名稱");
+
+    appData.days[appData.currentDay].items.push({ time, title, query });
+    document.getElementById('newTime').value = '';
+    document.getElementById('newTitle').value = '';
+    document.getElementById('newMapQuery').value = '';
+
+    renderTimeline();
+    saveData();
+  }
+
+  // 刪除行程
+  function deleteScheduleItem(index) {
+    appData.days[appData.currentDay].items.splice(index, 1);
+    renderTimeline();
+    saveData();
+  }
+
+  // 記帳相關功能
+  function addExpense() {
+    const name = document.getElementById('expenseItem').value;
+    const amount = parseFloat(document.getElementById('expenseAmount').value);
+
+    if (!name || isNaN(amount)) return alert("請輸入完整的項目名稱與金額");
+
+    appData.expenses.push({ name, amount });
+    document.getElementById('expenseItem').value = '';
+    document.getElementById('expenseAmount').value = '';
+
+    renderExpenses();
+    saveData();
+  }
+
+  function deleteExpense(index) {
+    appData.expenses.splice(index, 1);
+    renderExpenses();
+    saveData();
+  }
+
+  function clearExpenses() {
+    if (confirm("確定要清空所有記帳嗎？")) {
+      appData.expenses = [];
+      renderExpenses();
+      saveData();
+    }
+  }
+
+  function updateRate() {
+    appData.rate = parseFloat(document.getElementById('exchangeRate').value) || 0.052;
+    renderExpenses();
+    saveData();
+  }
+
+  function renderExpenses() {
+    const list = document.getElementById('expenseList');
+    list.innerHTML = '';
+    let totalJpy = 0;
+
+    appData.expenses.forEach((exp, index) => {
+      totalJpy += exp.amount;
+      const li = document.createElement('li');
+      li.className = 'expense-item';
+      li.innerHTML = `
+        <span>${exp.name}</span>
+        <span>${exp.amount.toLocaleString()} JPY 
+          <button class="btn-danger" style="margin-left:8px;" onclick="deleteExpense(${index})">✕</button>
+        </span>
+      `;
+      list.appendChild(li);
+    });
+
+    const totalHkd = Math.round(totalJpy * appData.rate);
+    document.getElementById('totalExpenseText').textContent = `${totalJpy.toLocaleString()} JPY (約 HKD $${totalHkd.toLocaleString()})`;
+  }
+
+  // 啟動 App
+  window.onload = initApp;
+</script>
+
+</body>
+</html>
